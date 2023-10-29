@@ -1,18 +1,13 @@
-using CoreAccess.DataEnvironment.Requests;
 using CoreAccess.DataEnvironment.Services;
+using CoreAccess.Equipment.Models;
 using FastEndpoints;
 using FluentValidation.Results;
 
-namespace CoreAccess.DataEnvironment.EndpointProcessors;
-public class TenantConnectionStringLoader : IGlobalPreProcessor
+namespace CoreAccess.Equipment.Processors;
+public class TenantConnectionStringLoader<TRequest> : PreProcessor<TRequest, EquipmentRequestState>
 {
-    public async Task PreProcessAsync(object req, HttpContext ctx, List<ValidationFailure> failures, CancellationToken ct)
+    public override async Task PreProcessAsync(TRequest req, EquipmentRequestState equipmentRequestState, HttpContext ctx, List<ValidationFailure> failures, CancellationToken ct)
     {
-        if (req is not IHasTenantRequest tenantRequest)
-        {
-            return;
-        }
-
         if (!Guid.TryParse(ctx.Request.Headers["x-tenant-id"], out var headerTenantId))
         {
             failures.Add(new("TenantId", "Tenant Id supplied is invalid"));
@@ -26,7 +21,6 @@ public class TenantConnectionStringLoader : IGlobalPreProcessor
 
         var tenantResolver = ctx.Resolve<ITenantResolver>();
         var connectionString = await tenantResolver.GetConnectionStringAsync(headerTenantId);
-        tenantRequest.ConnectionString = connectionString;
-        tenantRequest.TenantId = headerTenantId;
+        equipmentRequestState.ConnectionString = connectionString;
     }
 }

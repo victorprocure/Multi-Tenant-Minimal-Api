@@ -1,16 +1,16 @@
 using CoreAccess.Equipment.Mappers;
+using CoreAccess.Equipment.Models;
 using CoreAccess.Equipment.Requests;
 using CoreAccess.Equipment.Responses;
 using CoreAccess.Equipment.Services;
-using FastEndpoints;
 
 namespace CoreAccess.Equipment.Endpoints;
 
-public sealed class GetEquipmentEndpoint(IEquipmentRepository equipmentRepository) : Endpoint<GetEquipmentRequest, GetEquipmentResponse, EquipmentMapper>
+public sealed class GetEquipmentEndpoint(IEquipmentRepository equipmentRepository) : EquipmentEndpoint<GetEquipmentRequest, GetEquipmentResponse, EquipmentMapper>
 {
     private readonly IEquipmentRepository equipmentRepository = equipmentRepository;
 
-    public override void Configure()
+    protected override void PostConfiguration()
     {
         Get("/api/equipment/{equipmentId}");
         AllowAnonymous();
@@ -18,7 +18,8 @@ public sealed class GetEquipmentEndpoint(IEquipmentRepository equipmentRepositor
 
     public override async Task HandleAsync(GetEquipmentRequest req, CancellationToken ct)
     {
-        var equipment = await equipmentRepository.GetEquipmentByIdAsync(req.EquipmentId, req.ConnectionString, ct);
+        var requestState = ProcessorState<EquipmentRequestState>();
+        var equipment = await equipmentRepository.GetEquipmentByIdAsync(req.EquipmentId, requestState.ConnectionString, ct);
         var response = Map.FromEntity(equipment);
 
         await SendOkAsync(response, ct);

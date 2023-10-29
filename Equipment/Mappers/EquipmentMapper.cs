@@ -5,7 +5,7 @@ using FastEndpoints;
 
 namespace CoreAccess.Equipment.Mappers;
 
-public sealed class EquipmentMapper : Mapper<GetEquipmentRequest, GetEquipmentResponse, DbEquipment>
+public sealed class EquipmentMapper : ResponseMapper<GetEquipmentResponse, DbEquipment>
 {
     public override GetEquipmentResponse FromEntity(DbEquipment e)
         => new()
