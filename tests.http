@@ -7,7 +7,7 @@
 @gbr_tenant=b457a0d6-3ce5-4f15-99cc-0fb35e166e9e
 @aus_tenant=4f7ff208-64d3-4247-a327-ec5df7bed3fb
 
-@current_tenant={{gbr_tenant}}
+@current_tenant={{usa_tenant}}
 
 GET https://{{host}}/api/equipment/23
 x-tenant-id: {{current_tenant}}
